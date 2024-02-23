@@ -1,13 +1,12 @@
 import axios from "axios"
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+
 import { Bounce, toast } from "react-toastify"
-import { MESSRATING } from "../utils/constants"
-const Rating = () => {
-  const { id } = useParams()
+import { MESS } from "../utils/constants"
+const Status = () => {
   const [formData, setFormData] = useState({
-    messId: { messId: id },
-    rating: 0,
+    messId: sessionStorage["messId"],
+    status: "",
   })
 
   const handleChange = (e) => {
@@ -18,26 +17,12 @@ const Rating = () => {
     }))
   }
 
-  const handleRating = async (e) => {
+  const handleStatus = async (e) => {
     e.preventDefault()
 
-    if (formData.rating <= 0 && formData.rating > 5) {
-      toast.warning("Rating should in 1-5 range", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        transition: Bounce,
-      })
-    }
-
-    await axios.post(`${MESSRATING}/${id}`, formData).then((response) => {
+    await axios.post(`${MESS}/addstatus`, formData).then((response) => {
       if (response.data) {
-        toast.success("Rating add Successfully", {
+        toast.success("Status Update Successfully", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -49,31 +34,32 @@ const Rating = () => {
           transition: Bounce,
         })
         setFormData({
-          messId: { messId: id },
-          rating: 0,
+          messId: sessionStorage["messId"],
+          status: "",
         })
       }
     })
   }
   return (
-    <div className="max-w-md w-full h-1/2 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Rating</h2>
-      <form onSubmit={handleRating} className="">
+    <div className="max-w-md w-full h-full p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center">Mess Status</h2>
+      <form onSubmit={handleStatus} className="">
         <div className="mb-4">
-          <label htmlFor="rating" className="block font-semibold mb-1">
-            Rating
+          <label htmlFor="choice" className="block font-semibold mb-1">
+            Choose Type
           </label>
-          <input
-            type="text"
-            id="rating"
-            name="rating"
-            pattern="^[1-5]$"
-            placeholder="1-5 rating only"
-            value={formData.rating}
+          <select
+            id="status"
+            name="status"
+            value={formData.status}
             onChange={handleChange}
             className="w-full px-4 py-2 rounded-md border focus:outline-none focus:border-blue-500"
             required
-          />
+          >
+            <option value="">Select One</option>
+            <option value="open">open</option>
+            <option value="close">close</option>
+          </select>
         </div>
 
         <div className="text-center">
@@ -82,7 +68,7 @@ const Rating = () => {
               type="submit"
               className="bg-blue-500  text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
             >
-              GiveRating
+              Apply
             </button>
           ) : (
             <button
@@ -90,7 +76,7 @@ const Rating = () => {
               className="bg-gray-500  text-white px-6 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
               disabled
             >
-              GiveRating
+              Apply
             </button>
           )}
         </div>
@@ -98,4 +84,4 @@ const Rating = () => {
     </div>
   )
 }
-export default Rating
+export default Status
